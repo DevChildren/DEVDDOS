@@ -26,12 +26,14 @@ Script ini bertujuan untuk memberikan pemahaman tentang serangan DDoS (Distribut
 3. install modul dalam file requirements.txt
 4. mulai aplikasi 
   
-  
+   ```
    cd main
    ```
    python -m venv [nama env]
    ```
+   ```
    pip install -r requirements.txt
+   ```
    ```
    python main.py
    ```
