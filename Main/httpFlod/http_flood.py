@@ -46,7 +46,7 @@ class HttpFlood:
             try:
                 if self.use_tor:
                     session = self.tor_manager.get_tor_session()
-                    response = session.get("http://httpbin.org/ip")
+                    response = session.get("http://localhost:8000")
                     if response.status_code == 200:
                         logging.debug("Tor connection established. Your IP is: " + response.json()['origin'])
                     else:

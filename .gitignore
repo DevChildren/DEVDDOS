@@ -1,0 +1,18 @@
+# Mengabaikan file Python bytecode
+*.pyc
+
+# Mengabaikan direktori cache
+__pycache__/
+Main/__pycache__/
+Main/httpFlod/__pycache__/
+Main/dnsFlod/__pycache__/
+Main/synFlod/__pycache__/
+Main/udpFlod/__pycache__/
+Main/udpFlod/__pycache__/
+Main/dnsAmplificationFlod/__pycache__/
+.gitignore/
+
+
+#mengabaikan file spesifik
+Main/server.py
+Main/cekSoket.py

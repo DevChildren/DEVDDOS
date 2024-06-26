@@ -25,22 +25,19 @@ Script ini bertujuan untuk memberikan pemahaman tentang serangan DDoS (Distribut
 2. buat virtual enviroment
 3. install modul dalam file requirements.txt
 4. mulai aplikasi 
-   
-   cd DEVDOS
+  
+  
+   cd main
    ```
-   python -m venv [nama env anda]
+   python -m venv [nama env] 
    ```
    pip install -r requirements.txt
    ```
    python main.py
-
+   ```
 
 **Peringatan**: Pastikan untuk menggunakan aplikasi ini hanya untuk tujuan pendidikan dan penelitian yang sah. Penggunaan yang tidak sah atau tidak etis dapat melanggar hukum dan dikenai sanksi.
 
 ## Kontribusi
 
 Kontribusi terhadap pengembangan proyek ini sangat dihargai. Jika Anda ingin berkontribusi, silakan buat pull request dengan perubahan yang diusulkan.
-
-## Lisensi
-
-Proyek ini dilisensikan di bawah Lisensi MIT. Lihat berkas `LICENSE` untuk detail lebih lanjut

