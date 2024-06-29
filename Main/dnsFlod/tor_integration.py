@@ -29,7 +29,7 @@ def get_tor_session():
 def check_tor_connection():
     session = get_tor_session()
     try:
-        response = session.get("http://localhost:8000", timeout=10)
+        response = session.get("http://httpbin.org/ip", timeout=10)
         response.raise_for_status()  # Raise an error for bad status codes
         ip_info = response.json()
         

