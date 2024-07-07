@@ -31,7 +31,7 @@ class HttpRequestGenerator:
     def create_http_request(self):
         user_agent = self.get_random_user_agent()
         headers = self.get_random_headers()
-       # path = random.choice(["/", "/index.html", "/home", "/login", "/dashboard", "/register", "/account", "/profile"])
-        path = random.choice(["/mobile/index.php"])
+        #path = random.choice(["/", "/index.php", "/home", "/login", "/dashboard", "/register", "/account", "/profile", "/user_area/m","/m"])
+        path = random.choice(["/"])
         http_request = f"GET {path} HTTP/1.1\r\nHost: {self.target_ip}\r\nUser-Agent: {user_agent}\r\n{headers}\r\n\r\n"
         return http_request

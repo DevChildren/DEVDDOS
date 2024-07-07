@@ -32,7 +32,7 @@ class SynFlood:
 
     def send_syn_packet(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(1)
+        sock.settimeout(2)
 
         try:
             sock.connect((self.target_ip, self.target_port))
@@ -66,3 +66,4 @@ class SynFlood:
 
     def stop_attack(self):
         self.is_running = False
+
