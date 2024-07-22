@@ -8,7 +8,7 @@ from colorama import init, Fore
 init(autoreset=True)
 
 class SynFlood:
-    def __init__(self, target_ip, target_port, num_syns=1000, interval=0.1, num_threads=10):
+    def __init__(self, target_ip, target_port, num_syns=1000, interval=0.1, num_threads=10, log_to_file=False):
         self.target_ip = target_ip
         self.target_port = target_port
         self.num_syns = num_syns
@@ -16,9 +16,15 @@ class SynFlood:
         self.num_threads = num_threads
         self.is_running = True
         self.syn_count = 0
-
+        
         # Setup logging
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+        if log_to_file:
+            file_handler = logging.FileHandler('syn_flood.log')
+            file_handler.setLevel(logging.DEBUG)
+            formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+            file_handler.setFormatter(formatter)
+            logging.getLogger().addHandler(file_handler)
 
     def create_syn_packet(self):
         """Create a TCP SYN packet."""
@@ -66,4 +72,3 @@ class SynFlood:
 
     def stop_attack(self):
         self.is_running = False
-

